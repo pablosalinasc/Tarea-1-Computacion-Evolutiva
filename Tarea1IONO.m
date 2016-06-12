@@ -17,15 +17,17 @@ IONO = load('IONO.data');
 %% Parametros
 
 global size_poblacion
-size_poblacion=40;%Tamaño poblacion inicial
+size_poblacion=80;%Tamaño poblacion inicial
 tasa_cruzamiento=0.5;%Tasa de cruzamiento
-tasa_mutacion=0.1;%Tasa de mutación
+tasa_mutacion=0.3;%Tasa de mutación
 global size_string
 size_string=34;%Largo del string
 generaciones=40;%Cantidad de generaciones
-size_torneo = 2; %Tamaño torneo
+size_torneo = 8; %Tamaño torneo
 poblacion_elite=2; %Tamaño de la población de elite
 poblaciones_sin_mejora=20; %Cantidad de poblaciones aceptadas sin mejoras
+global lambda
+lambda=0.1;
 tiempo_inicio = cputime;
 parametros = gaoptimset('CreationFcn', {@poblacionInicial},...
                      'PopulationSize',size_poblacion,...
@@ -70,6 +72,7 @@ end
 %% Función de fitness
 function [valor_fitness] = Fitness(string)
     %% Paso del string a lista de atributos seleccionados
+    global lambda
     global size_string
     listaAux=zeros(1,size_string);
     contador=0;
@@ -99,7 +102,7 @@ function [valor_fitness] = Fitness(string)
 
         outLabel = svmclassify(svmStruct,testingSample,'showplot',false);
 
-        valor_fitness=1-sum(grp2idx(outLabel)==grp2idx(testingLabel))/sum(Test)+0.1*(contador/size_string);
+        valor_fitness=(1-lambda)*(1-(sum(grp2idx(outLabel)==grp2idx(testingLabel))/sum(Test)))+lambda*(contador/size_string);
     else
         valor_fitness=1;
     end
